@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReceiverEntity } from './receiver.entity';
-import { ReceiverService } from './receiver.service';
+import { ReceiverApiService } from './receiver.api.service';
 import { ReceiverController } from './receiver.controller';
 
 @Module({
@@ -10,7 +10,7 @@ import { ReceiverController } from './receiver.controller';
         TypeOrmModule.forFeature([ReceiverEntity]),
     ],
     providers: [
-        ReceiverService,
+        ReceiverApiService,
     ],
     controllers: [
         ReceiverController,

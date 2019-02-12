@@ -1,15 +1,16 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('receivers')
 export class ReceiverEntity {
-    @PrimaryColumn()
-    id: string;
-    @Column({ default: 'receivers' })
+    @PrimaryColumn({ type: 'int', unique: true })
+    id: number;
+    @Column({ readonly: true, default: 'receivers' })
     objectType: string;
+    @Index()
     @Column()
     organization: string;
     @Column({ default: true })
-    isDeleteable: boolean;
+    isDeletable: boolean;
     @Column({ type: 'int', default: 0 })
     status: number;
     @Column()
@@ -24,7 +25,7 @@ export class ReceiverEntity {
     city: string;
     @Column({ nullable: true })
     street: string;
-    @Column()
+    @Column({ nullable: true })
     email: string;
     @Column({ nullable: true })
     phone: string;
@@ -32,4 +33,8 @@ export class ReceiverEntity {
     fax: string;
     @Column({ nullable: true })
     webSite: string;
+    @CreateDateColumn()
+    createdAt: Date;
+    @UpdateDateColumn()
+    changedAt: Date;
 }
