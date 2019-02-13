@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReceiverEntity } from './receiver.entity';
 import { ReceiverDTO } from './receiver.dto';
+import { ReceiverCreateDTO } from './receiver-create.dto';
+import { ReceiverUpdateDTO } from './receiver-update.dto';
 
 @Injectable()
 export class ReceiverApiService {
@@ -10,30 +12,36 @@ export class ReceiverApiService {
         @InjectRepository(ReceiverEntity)
         private readonly repository: Repository<ReceiverEntity>) {}
 
-    async findAll(): Promise<ReceiverDTO[]> {
-        return await this.repository.find();
+    findAll(): Promise<ReceiverDTO[]> {
+        return this.repository.find();
     }
 
-    async findAllByOrg(orgId: string): Promise<ReceiverDTO[]> {
-        return await this.repository.find({ where: { organization: orgId }});
+    findAllByOrg(orgId: string): Promise<ReceiverDTO[]> {
+        return this.repository.find({ where: { organization: orgId }});
     }
 
-    async findById(id: number): Promise<any> {
-        return await this.repository.findOne(id);
+   findById(id: number): Promise<any> {
+        return this.repository.findOne(id);
     }
 
-    async create(receiver: ReceiverDTO): Promise<ReceiverDTO> {
+    async create(receiver: ReceiverCreateDTO): Promise<ReceiverDTO> {
         const id = await this.nextId();
         const entity = this.repository.create({...receiver, id});
-        return this.repository.save(entity);
+        const result = await this.repository.save(entity);
+        if (!result) {
+            throw new Error('not_created');
+        }
+        return result;
     }
 
-    async update(receiver: ReceiverDTO): Promise<ReceiverDTO> {
-        const found = await this.repository.findOne(receiver.id);
+    async update(updates: ReceiverUpdateDTO): Promise<ReceiverDTO> {
+        const found = await this.repository.findOne(updates.id);
         if (!found) {
             throw new Error('not found');
         }
-        const entity = this.repository.create(receiver);
+        const merged = Object.assign({}, {...found }, {...updates}) as ReceiverDTO;
+        Logger.log(`merged: ${JSON.stringify(merged)}`, 'ReceiverApiService');
+        const entity = this.repository.create(merged);
         return this.repository.save(entity);
     }
 
@@ -50,7 +58,6 @@ export class ReceiverApiService {
             .createQueryBuilder('receiver')
             .select('max(receiver.id)')
             .getRawOne();
-        Logger.log(`Last used receiver id: ${curr.max}`, 'ReceiverService');
         return curr ? curr.max + 1 : 1901;
     }
 }

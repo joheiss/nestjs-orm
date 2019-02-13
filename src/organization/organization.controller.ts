@@ -1,6 +1,9 @@
-import { Controller, Get, Body, Post, Put, Param, Logger, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UsePipes } from '@nestjs/common';
 import { OrganizationDTO } from './organization.dto';
 import { OrganizationApiService } from './organization.api.service';
+import { ValidationPipe } from '../shared/validation/validation.pipe';
+import { OrganizationCreateDTO } from './organization-create.dto';
+import { OrganizationUpdateDTO } from './organization-update.dto';
 
 @Controller('api/organizations')
 export class OrganizationController {
@@ -13,34 +16,65 @@ export class OrganizationController {
     }
 
     @Get(':id')
-    getOne(@Param('id') id: string): any {
-        return this.api.findById(id);
+    async getOne(@Param('id') id: string): Promise<any> {
+        const result = await this.api.findById(id);
+        if (result) {
+            return result;
+        } else {
+            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+        }
     }
 
     @Get(':id/tree')
-    getAllByParent(@Param('id') id: string): Promise<any> {
-        return this.api.findTree(id);
+   async getAllByParent(@Param('id') id: string): Promise<any> {
+        try {
+            const result = await this.api.findTree(id);
+            return result;
+        } catch (ex) {
+            throw new HttpException(ex.toString(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @Get(':id/treeids')
-    getAllIdsByParent(@Param('id') id: string): Promise<string[]> {
-        return this.api.findTreeIds(id);
+    async getAllIdsByParent(@Param('id') id: string): Promise<string[]> {
+        try {
+            const result = await this.api.findTreeIds(id);
+            return result;
+        } catch (ex) {
+            throw new HttpException(ex.toString(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @Post()
-    create(@Body() organization: OrganizationDTO): any {
-        return this.api.create(organization);
+    @UsePipes(new ValidationPipe())
+    async create(@Body() organization: OrganizationCreateDTO): Promise<OrganizationDTO> {
+        try {
+            const result = await this.api.create(organization);
+            return result;
+        } catch (ex) {
+            throw new HttpException(ex.toString(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Put(':id')
-    update(@Param('id') id: string, @Body() updates: Partial<OrganizationDTO>): any {
+    @UsePipes(new ValidationPipe())
+    async update(@Param('id') id: string, @Body() updates: Partial<OrganizationUpdateDTO>): Promise<OrganizationDTO> {
         const organization = { id, ...updates } as OrganizationDTO;
-        Logger.log(`Organization to be updated: ${organization.id}`, 'OrganizationController');
-        return this.api.update(organization);
+        try {
+            const result = await this.api.update(organization);
+            return result;
+        } catch (ex) {
+            throw new HttpException(ex.toString(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @Delete(':id')
-    delete(@Param('id') id: string): any {
-        return this.api.delete(id);
+    async delete(@Param('id') id: string): Promise<OrganizationDTO> {
+        try {
+            const result = await this.api.delete(id);
+            return result;
+        } catch (ex) {
+            throw new HttpException(ex.toString(), HttpStatus.NOT_FOUND);
+        }
     }
 }

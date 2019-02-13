@@ -19,8 +19,12 @@ export class OrganizationEntity {
     status: number;
     @Column()
     name: string;
-    @Column()
+    @Column({ nullable: true})
     timezone: string;
+    @Column({ nullable: true})
+    currency: string;
+    @Column({ nullable: true})
+    locale: string;
     @TreeChildren()
     children: OrganizationEntity[];
     @TreeParent()

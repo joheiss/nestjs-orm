@@ -6,7 +6,7 @@ export class ReceiverEntity {
     id: number;
     @Column({ readonly: true, default: 'receivers' })
     objectType: string;
-    @Index()
+    @Index({ unique: false })
     @Column()
     organization: string;
     @Column({ default: true })
