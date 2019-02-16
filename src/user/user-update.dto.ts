@@ -1,17 +1,17 @@
 import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUrl, MinLength } from 'class-validator';
 
-export class UserCreateDTO {
-    @IsString() @IsNotEmpty()
+export class UserUpdateDTO {
+    @IsOptional() @IsString() @IsNotEmpty()
     id: string;
-    @IsString() @IsNotEmpty() @MinLength(8)
+    @IsOptional() @IsString() @IsNotEmpty() @MinLength(8)
     password: string;
     @IsOptional() @IsString()
     organization: string;
     @IsOptional() @IsArray()
     roles: string[];
-    @IsString() @IsNotEmpty()
+    @IsOptional() @IsString() @IsNotEmpty()
     displayName: string;
-    @IsEmail()
+    @IsOptional() @IsEmail() @IsNotEmpty()
     email: string;
     @IsOptional() @IsPhoneNumber('ZZ')
     phone: string;

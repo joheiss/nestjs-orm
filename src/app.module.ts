@@ -7,17 +7,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Connection } from 'typeorm';
 import { UserModule } from './user/user.module';
-
+import { AuthModule } from './auth/auth.module';
 
 import 'reflect-metadata';
 
 @Module({
     imports: [
         TypeOrmModule.forRoot(),
-        OrganizationModule,
-        ReceiverModule,
         SharedModule,
+        AuthModule,
         UserModule,
+        OrganizationModule,
+        ReceiverModule
     ],
     controllers: [AppController],
     providers: [

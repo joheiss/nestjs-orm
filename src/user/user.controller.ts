@@ -1,57 +1,65 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, UsePipes } from '@nestjs/common';
-import { UserApiService } from './user.api.service';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, UseGuards, UsePipes } from '@nestjs/common';
+import { AuthorizationGuard, Roles } from '../auth';
 import { ValidationPipe } from '../shared/validation/validation.pipe';
+
+import { UserApiService } from './user.api.service';
 import { UserDTO } from './user.dto';
 import { UserCreateDTO } from './user-create.dto';
+import { UserUpdateDTO } from './user-update.dto';
 
-@Controller()
+@Controller('api/users')
+@UseGuards(AuthorizationGuard)
+@Roles('admin', 'super')
 export class UserController {
-    constructor(private readonly api: UserApiService) {
-    }
 
-    @Get('api/users')
-    getAll(): any {
+    constructor(private readonly api: UserApiService) {}
+
+    @Get()
+    getAll(): Promise<UserDTO[]> {
         return this.api.findAll();
     }
 
-    @Get('api/users/:username')
-    async getOne(@Param('username') username: string): Promise<UserDTO> {
+    @Get(':id')
+    async getOne(@Param('id') id: string): Promise<UserDTO> {
         try {
-            const result = await this.api.findByUsername(username);
-            return result;
+            return await this.api.findById(id);
         } catch (ex) {
-            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+            throw new HttpException(ex.message, HttpStatus.NOT_FOUND);
         }
     }
 
-    @Post('api/users')
+    @Post()
     @UsePipes(new ValidationPipe())
     async create(@Body() user: UserCreateDTO): Promise<UserDTO> {
         try {
-            const result = await this.api.create(user);
-            return result;
+            return await this.api.create(user);
         } catch (ex) {
-            throw new HttpException(ex.toString(), HttpStatus.BAD_REQUEST);
-        }
-    }
-    @Post('api/login')
-    @UsePipes(new ValidationPipe())
-    async login(@Body() user: UserCreateDTO): Promise<UserDTO> {
-        try {
-            const result = await this.api.login(user);
-            return result;
-        } catch (ex) {
-            throw new HttpException(ex.toString(), HttpStatus.BAD_REQUEST);
+            throw new HttpException(ex.message, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @Delete('api/users/:username')
-    async delete(@Param('username') username: string): Promise<UserDTO> {
+    @Put(':id')
+    @UsePipes(new ValidationPipe())
+    async update(
+        @Param('id') id: string,
+        @Body() updates: Partial<UserUpdateDTO>
+    ): Promise<UserDTO> {
+
+        const user = { id, ...updates } as UserUpdateDTO;
+        Logger.log(`update: ${JSON.stringify(user)}`, 'UserController');
         try {
-            const result = await this.api.delete(username);
-            return result;
+            return await this.api.update(user);
         } catch (ex) {
-            throw new HttpException(ex.toString(), HttpStatus.NOT_FOUND);
+            throw new HttpException(ex.message, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Delete(':id')
+    async delete(@Param('id') username: string): Promise<UserDTO> {
+        try {
+            return await this.api.delete(username);
+        } catch (ex) {
+            throw new HttpException(ex.message, HttpStatus.NOT_FOUND);
         }
     }
 }

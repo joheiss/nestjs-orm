@@ -1,10 +1,5 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryColumn, Tree, TreeChildren, TreeParent,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, Tree, TreeChildren, TreeParent, UpdateDateColumn } from 'typeorm';
+import { OrganizationDTO } from './organization.dto';
 
 @Entity('organizations')
 @Tree('materialized-path')
@@ -33,4 +28,14 @@ export class OrganizationEntity {
     createdAt: Date;
     @UpdateDateColumn()
     changedAt: Date;
+
+    toDTO(withTree = false): OrganizationDTO {
+        const { isDeletable, createdAt, changedAt, parent, children, ...dto} = this;
+        let tree: OrganizationDTO[];
+        if (withTree && children && children.length > 0) {
+            tree = children.map(c => c.toDTO(withTree));
+            return { ...dto, children: tree } as OrganizationDTO;
+        }
+        return { ...dto } as OrganizationDTO;
+    }
 }

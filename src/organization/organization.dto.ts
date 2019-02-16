@@ -8,4 +8,5 @@ export interface OrganizationDTO {
     currency: string;
     locale: string;
     parentId?: string;
+    children?: OrganizationDTO[];
 }

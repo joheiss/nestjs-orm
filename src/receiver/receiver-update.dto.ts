@@ -16,7 +16,7 @@ import {
 
 export class ReceiverUpdateDTO {
     @IsOptional()  @IsInt()
-    id?: number;
+    id: number;
     @IsOptional() @IsString()
     objectType?: string;
     @IsOptional() @IsString()

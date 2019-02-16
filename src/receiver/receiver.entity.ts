@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { ReceiverDTO } from './receiver.dto';
 
 @Entity('receivers')
 export class ReceiverEntity {
@@ -37,4 +38,9 @@ export class ReceiverEntity {
     createdAt: Date;
     @UpdateDateColumn()
     changedAt: Date;
+
+    toDTO(): ReceiverDTO {
+        const { isDeletable, createdAt, changedAt, ...dto} = this;
+        return dto as ReceiverDTO;
+    }
 }

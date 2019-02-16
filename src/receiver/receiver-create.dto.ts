@@ -17,7 +17,7 @@ import {
 export class ReceiverCreateDTO {
     @IsOptional() @IsString()
     objectType?: string;
-    @IsString()
+    @IsOptional() @IsString()
     organization: string;
     @IsOptional() @IsBoolean()
     isDeletable?: boolean;
