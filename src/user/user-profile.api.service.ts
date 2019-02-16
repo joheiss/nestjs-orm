@@ -7,9 +7,16 @@ import { UserProfileDTO } from './user-profile.dto';
 
 @Injectable()
 export class UserProfileApiService {
-    constructor(
-        @InjectRepository(UserProfileEntity) private readonly repository: Repository<UserProfileEntity>
- ) {}
+
+    constructor(@InjectRepository(UserProfileEntity) private readonly repository: Repository<UserProfileEntity>) {}
+
+    async findById(id: string): Promise<UserProfileDTO> {
+        const result = await this.repository.findOne(id);
+        if (!result) {
+            throw new Error('userprofile_not found');
+        }
+        return result.toDTO();
+    }
 
     async update(updates: UserProfileUpdateDTO): Promise<UserProfileDTO> {
         try {

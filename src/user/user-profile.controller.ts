@@ -1,5 +1,5 @@
-import { Body, Controller, HttpException, HttpStatus, Logger, Param, Put, UseGuards, UsePipes } from '@nestjs/common';
-import { Auth, AuthorizationGuard, Roles } from '../auth';
+import { Body, Controller, Get, HttpException, HttpStatus, Logger, Param, Put, UseGuards, UsePipes } from '@nestjs/common';
+import { Auth, AuthDTO, AuthorizationGuard, Roles } from '../auth';
 import { ValidationPipe } from '../shared/validation/validation.pipe';
 import { UserProfileDTO } from './user-profile.dto';
 import { UserProfileUpdateDTO } from './user-profile-update.dto';
@@ -11,6 +11,17 @@ import { UserProfileApiService } from './user-profile.api.service';
 export class UserProfileController {
 
     constructor(private readonly api: UserProfileApiService) {}
+
+    @Get(':id')
+    async getById(
+        @Auth() auth: AuthDTO,
+        @Param('id') id: string,
+    ): Promise<UserProfileDTO> {
+        if (id !== auth.id && !auth.roles.filter(role => role !== 'admin' && role !== 'super')) {
+            throw new HttpException('usersetting_get_not_allowed', HttpStatus.FORBIDDEN);
+        }
+        return await this.api.findById(id);
+    }
 
     @Put(':id')
     @UsePipes(new ValidationPipe())
