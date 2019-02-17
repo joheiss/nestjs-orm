@@ -6,3 +6,4 @@ export * from './auth.api.service';
 export * from './auth.controller';
 export * from './auth.dto';
 export * from './auth-create.dto';
+export * from './auth.utility';

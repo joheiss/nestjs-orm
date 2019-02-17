@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Logger, Param, Post, Put, UseGuards, UsePipes } from '@nestjs/common';
-import { Auth, AuthorizationGuard, Roles } from '../auth';
+import { Auth, AuthDTO, AuthUtility, AuthorizationGuard, Roles } from '../auth';
 import { ValidationPipe } from '../shared/validation/validation.pipe';
 import { UserProfileDTO } from './user-profile.dto';
 import { UserSettingCreateUpdateDTO } from './user-setting-create-update.dto';
@@ -19,9 +19,11 @@ export class UserSettingController {
         @Param('id') id: string,
         @Param('type') type: string,
     ): Promise<UserSettingDTO> {
-        if (id !== userId) {
+
+        if (!AuthUtility.isOwner(id, userId)) {
             throw new HttpException('usersetting_get_not_allowed', HttpStatus.FORBIDDEN);
         }
+
         try {
             return await this.api.findByUserIdAndType(id, type);
         } catch (ex) {
@@ -34,7 +36,8 @@ export class UserSettingController {
         @Auth('id') userId: string,
         @Param('id') id: string,
     ): Promise<UserSettingDTO[]> {
-        if (id !== userId) {
+
+        if (!AuthUtility.isOwner(id, userId)) {
             throw new HttpException('usersetting_get_not_allowed', HttpStatus.FORBIDDEN);
         }
         return await this.api.findByUserId(id);
@@ -48,10 +51,12 @@ export class UserSettingController {
         @Param('type') type: string,
         @Body() updates: UserSettingCreateUpdateDTO,
     ): Promise<UserProfileDTO> {
+
         Logger.log(`user id: ${id}, ${userId}`, 'UserSettingApiService');
-        if (id !== userId) {
+        if (!AuthUtility.isOwner(id, userId)) {
             throw new HttpException('usersetting_create_not_allowed', HttpStatus.FORBIDDEN);
         }
+
         const setting = { id, type, ...updates } as UserSettingCreateUpdateDTO;
         Logger.log(`update: ${JSON.stringify(setting)}`, 'UserSettingController');
         try {
@@ -69,10 +74,12 @@ export class UserSettingController {
         @Param('type') type: string,
         @Body() updates: Partial<UserSettingCreateUpdateDTO>,
     ): Promise<UserProfileDTO> {
+
         Logger.log(`user id: ${id}, ${userId}`, 'UserSettingApiService');
-        if (id !== userId) {
+        if (!AuthUtility.isOwner(id, userId)) {
             throw new HttpException('usersetting_update_not_allowed', HttpStatus.FORBIDDEN);
         }
+
         const setting = { id, type, ...updates } as UserSettingCreateUpdateDTO;
         Logger.log(`update: ${JSON.stringify(setting)}`, 'UserSettingController');
         try {
@@ -88,9 +95,11 @@ export class UserSettingController {
         @Param('id') id: string,
         @Param('type') type: string,
     ): Promise<UserSettingDTO> {
-        if (id !== userId) {
+
+        if (!AuthUtility.isOwner(id, userId)) {
             throw new HttpException('usersetting_delete_not_allowed', HttpStatus.FORBIDDEN);
         }
+
         try {
             return await this.api.deleteByUserIdAndType(id, type);
         } catch (ex) {
@@ -100,12 +109,14 @@ export class UserSettingController {
 
     @Delete(':id')
     async deleteByUser(
-        @Auth('id') userId: string,
+        @Auth() auth: AuthDTO,
         @Param('id') id: string)
         : Promise<UserSettingDTO[]> {
-        if (id !== userId) {
+
+        if (!AuthUtility.isOwner(id, auth.id) && !AuthUtility.isAdmin(auth)) {
             throw new HttpException('usersetting_delete_not_allowed', HttpStatus.FORBIDDEN);
         }
+
         try {
             return await this.api.deleteByUserId(id);
         } catch (ex) {

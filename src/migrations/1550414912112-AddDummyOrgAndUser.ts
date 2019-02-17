@@ -13,7 +13,7 @@ export class AddDummyOrgAndUser1550414912112 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<any> {
 
         const anyOrg = await queryRunner.query(`SELECT * FROM "organizations"`);
-        if (!anyOrg) {
+        if (anyOrg) {
             console.log(`Adding dummy organization ...`);
             const dummyOrg = await queryRunner.query(`SELECT * FROM "organizations" WHERE id = "?"`, [this.orgId]);
             if (!dummyOrg) {
@@ -27,7 +27,7 @@ export class AddDummyOrgAndUser1550414912112 implements MigrationInterface {
         }
 
         const anySuperUser = await queryRunner.query(`SELECT * FROM "users" WHERE roles LIKE '%super%'`);
-        if (!anySuperUser) {
+        if (anySuperUser) {
             console.log(`Adding dummy user ...`);
             const dummyUser = await queryRunner.query(`SELECT * FROM "users" WHERE id = "?"`, [this.userId]);
             if (!dummyUser) {
