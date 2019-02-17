@@ -14,3 +14,7 @@ export * from './user-setting.entity';
 export * from './user-setting-create-update.dto';
 export * from './user-setting.api.service';
 export * from './user-setting.controller';
+export * from './user-bookmark.entity';
+export * from './user-bookmark-create.dto';
+export * from './user-bookmark.api.service';
+export * from './user-bookmark.controller';

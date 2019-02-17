@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinTable, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { UserProfileDTO } from './user-profile.dto';
 import { UserSettingEntity } from './user-setting.entity';
+import { UserBookmarkEntity } from './user-bookmark.entity';
 
 @Entity('user_profiles')
 export class UserProfileEntity {
@@ -24,6 +25,10 @@ export class UserProfileEntity {
     @OneToMany(() => UserSettingEntity, setting => setting.id, { cascade: true })
     @JoinTable()
     settings: UserSettingEntity[];
+
+    @OneToMany(() => UserBookmarkEntity, bookmark => bookmark.id, { cascade: true })
+    @JoinTable()
+    bookmarks: UserBookmarkEntity[];
 
     toDTO(): UserProfileDTO  {
         const { createdAt, changedAt, ...dto} = this;

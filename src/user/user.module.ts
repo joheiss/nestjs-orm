@@ -11,6 +11,9 @@ import { UserProfileApiService } from './user-profile.api.service';
 import { UserSettingEntity } from './user-setting.entity';
 import { UserSettingController } from './user-setting.controller';
 import { UserSettingApiService } from './user-setting.api.service';
+import { UserBookmarkEntity } from './user-bookmark.entity';
+import { UserBookmarkController } from './user-bookmark.controller';
+import { UserBookmarkApiService } from './user-bookmark.api.service';
 
 @Module({
     imports: [
@@ -18,18 +21,21 @@ import { UserSettingApiService } from './user-setting.api.service';
             UserEntity,
             UserProfileEntity,
             UserSettingEntity,
+            UserBookmarkEntity,
             OrganizationEntity
         ]),
     ],
   controllers: [
       UserController,
       UserProfileController,
-      UserSettingController
+      UserSettingController,
+      UserBookmarkController
   ],
   providers: [
       UserApiService,
       UserProfileApiService,
       UserSettingApiService,
+      UserBookmarkApiService,
       OrganizationApiService
   ]
 })
